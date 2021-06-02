@@ -11,7 +11,7 @@ import (
 
 const MaxUint64 = 1<<64 - 1
 
-const AddressLength = 32
+const AddressLength = 20
 const HashLength = 32
 
 var (
@@ -19,6 +19,24 @@ var (
 )
 
 type Hash [HashLength]byte
+type Address [AddressLength]byte
+
+//构造函数族
+func BytesToAddress(b []byte) Address {
+	var a Address
+	a.SetBytes(b)
+	return a
+}
+
+//赋值函数，如b超出a的容量则截取后半部分
+func (a *Address) SetBytes(b []byte) {
+	if len(b) > len(a) {
+		b = b[len(b)-AddressLength:]
+	}
+	copy(a[:], b[:])
+}
+
+func (a Address) Bytes() []byte { return a[:] }
 
 func BytesToHash(b []byte) Hash {
 	var h Hash

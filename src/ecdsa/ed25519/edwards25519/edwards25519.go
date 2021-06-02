@@ -808,6 +808,22 @@ func geSub(r *CompletedGroupElement, p *ExtendedGroupElement, q *CachedGroupElem
 	FeAdd(&r.T, &t0, &r.T)
 }
 
+func GeSub(r *CompletedGroupElement, p *ExtendedGroupElement, q *CachedGroupElement) {
+	var t0 FieldElement
+
+	FeAdd(&r.X, &p.Y, &p.X)
+	FeSub(&r.Y, &p.Y, &p.X)
+	FeMul(&r.Z, &r.X, &q.yMinusX)
+	FeMul(&r.Y, &r.Y, &q.yPlusX)
+	FeMul(&r.T, &q.T2d, &p.T)
+	FeMul(&r.X, &p.Z, &q.Z)
+	FeAdd(&t0, &r.X, &r.X)
+	FeSub(&r.X, &r.Z, &r.Y)
+	FeAdd(&r.Y, &r.Z, &r.Y)
+	FeSub(&r.Z, &t0, &r.T)
+	FeAdd(&r.T, &t0, &r.T)
+}
+
 func geMixedAdd(r *CompletedGroupElement, p *ExtendedGroupElement, q *PreComputedGroupElement) {
 	var t0 FieldElement
 
@@ -955,6 +971,16 @@ func selectPoint(t *PreComputedGroupElement, pos int32, b int32) {
 	FeCopy(&minusT.yMinusX, &t.yPlusX)
 	FeNeg(&minusT.xy2d, &t.xy2d)
 	PreComputedGroupElementCMove(t, &minusT, bNegative)
+}
+
+func GeScalarMult(h *ExtendedGroupElement, a *[32]byte) *ExtendedGroupElement {
+	r := new(ExtendedGroupElement)
+	var pg ProjectiveGroupElement
+	GeDoubleScalarMultVartime(&pg, a, h, &[32]byte{}) // h^a * g^0
+	var t [32]byte
+	pg.ToBytes(&t)
+	r.FromBytes(&t)
+	return r
 }
 
 // GeScalarMultBase computes h = a*B, where

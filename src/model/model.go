@@ -35,3 +35,9 @@ type SharePiece struct {
 	Share bls.Seckey
 	Pub   bls.Pubkey
 }
+
+type Miner struct {
+	Id           []byte `json:"id,omitempty"`
+	PublicKey    []byte `json:"publicKey,omitempty"`
+	VrfPublicKey []byte `json:"vrfPublicKey,omitempty"`
+}
