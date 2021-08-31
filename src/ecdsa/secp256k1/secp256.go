@@ -79,6 +79,7 @@ func Sign(msg []byte, seckey []byte) ([]byte, error) {
 	)
 	C.secp256k1_ecdsa_recoverable_signature_serialize_compact(context, sigdata, &recid, &sigstruct)
 	sig[64] = byte(recid) // add back recid to get 65 bytes sig
+	sig[64] += 27         // Transform V from 0/1 to 27/28 为了跟以太坊保持一致
 	return sig, nil
 }
 

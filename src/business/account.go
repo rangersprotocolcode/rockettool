@@ -32,7 +32,7 @@ type publicKey struct {
 	key ecdsa.PublicKey
 }
 
-func CreateNewAccount() {
+func CreateNewAccount(nodeType int) {
 	r := rand.Reader
 	var pk privateKey
 	_pk, err := ecdsa.GenerateKey(secp256k1.S256(), r)
@@ -41,27 +41,10 @@ func CreateNewAccount() {
 	} else {
 		panic(fmt.Sprintf("GenKey Failed, reason : %v.\n", err.Error()))
 	}
-	printAccountInfo(pk)
+	printAccountInfo(pk, nodeType)
 }
 
-func newAccount() (string, string, privateKey) {
-	r := rand.Reader
-	var pk privateKey
-	_pk, err := ecdsa.GenerateKey(secp256k1.S256(), r)
-	if err == nil {
-		pk.key = *_pk
-	} else {
-		panic(fmt.Sprintf("GenKey Failed, reason : %v.\n", err.Error()))
-	}
-	privateKeyStr := pk.getHexString()
-
-	publicKey := pk.getPubKey()
-	publicKeyStr := publicKey.getHexString()
-
-	return privateKeyStr, publicKeyStr, pk
-}
-
-func printAccountInfo(privateKey privateKey) {
+func printAccountInfo(privateKey privateKey, nodeType int) {
 
 	publicKey := privateKey.getPubKey()
 	address := publicKey.GetAddress()
@@ -81,6 +64,43 @@ func printAccountInfo(privateKey privateKey) {
 	fmt.Println("Account info:")
 	fmt.Println("PrivateKey:" + privateKey.getHexString())
 	fmt.Println("MinerJson:" + string(minerJson))
+	if -1 != nodeType {
+		printMinerApplyTx(nodeType, "0x"+hex.EncodeToString(address[:]), string(minerJson))
+	}
+}
+
+func printMinerApplyTx(nodeType int, target, data string) {
+	{
+		source := "0x6420e467c77514e09471a7d84e0552c13b5e97192f523c05d3970d7ee23bf443"
+		tx := model.Transaction{Type: 2, Source: source, Target: target, Time: "1000"} //time.Now().String()
+
+		//data := `{"id":"mlrcS4PtQnL4rwxGaGqThwE5GuNXa3eJHiq050OPRC4=","publicKey":"BOu0RbvBDBlVUySzb+ojoE7BTO67yhYQWdOvqClYG+Qu11SFY79i1lDou9VkPfnpX0KPhlvtpTIIK3IIR2K1meM=","vrfPublicKey":"Dw7zNJeE4wj+diK2c/P+9raL6R72SY1ySbleYVihJtU="}`
+		var obj = model.Miner{}
+		err := json.Unmarshal([]byte(data), &obj)
+		if err != nil {
+			fmt.Printf("ummarshal error:%v", err)
+		}
+
+		if 1 == nodeType {
+			obj.Stake = 1250
+		} else {
+			obj.Stake = 250
+		}
+		obj.Type = nodeType
+
+		applyData, _ := json.Marshal(obj)
+		//fmt.Printf("data:%v\n",string(applyData))
+
+		tx.Data = string(applyData)
+		tx.Hash = tx.GenHash()
+
+		privateKeyStr := "0x040a0c4baa2e0b927a2b1f6f93b317c320d4aa3a5b54c0a83f5872c23155dcf1455fb015a7699d4ef8491cc4c7a770e580ab1362a0e3af9f784dd2485cfc9ba7c1e7260a418579c2e6ca36db4fe0bf70f84d687bdf7ec6c0c181b43ee096a84aea"
+		privateKey := HexStringToSecKey(privateKeyStr)
+		sign := privateKey.Sign(tx.Hash.Bytes())
+		tx.Sign = &sign
+
+		fmt.Printf("tx: %s\n\n", tx.ToTxJson().ToString())
+	}
 }
 
 //导入函数
@@ -144,6 +164,40 @@ func (pk *privateKey) getPubKey() publicKey {
 	var pubKey publicKey
 	pubKey.key = pk.key.PublicKey
 	return pubKey
+}
+
+//私钥签名函数
+func (pk *privateKey) Sign(hash []byte) model.Sign {
+	var sign model.Sign
+	sig, err := secp256k1.Sign(hash, pk.key.D.Bytes())
+	if err == nil {
+		if len(sig) != 65 {
+			fmt.Printf("secp256k1 sign wrong! hash = %v\n", hash)
+		}
+		sign = *BytesToSign(sig)
+	} else {
+		panic(fmt.Sprintf("Sign Failed, reason : %v.\n", err.Error()))
+	}
+
+	return sign
+}
+
+//Sign必须65 bytes
+func BytesToSign(b []byte) *model.Sign {
+	if len(b) == 65 {
+		var r, s big.Int
+		br := b[:32]
+		r = *r.SetBytes(br)
+
+		sr := b[32:64]
+		s = *s.SetBytes(sr)
+
+		recid := b[64]
+		return &model.Sign{r, s, recid}
+	} else {
+		//这里组签名暂不处理
+		return nil
+	}
 }
 
 func (pk publicKey) getHexString() string {

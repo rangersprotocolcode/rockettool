@@ -36,6 +36,7 @@ type exitCommand struct {
 
 type createAccountCommand struct {
 	baseCommand
+	nodeType int
 }
 
 type createGenesisGroupCommand struct {
@@ -73,7 +74,7 @@ func (command *helpCommand) showUsage() {
 }
 
 func (command *createAccountCommand) process(params []string) {
-	business.CreateNewAccount()
+	business.CreateNewAccount(command.nodeType)
 }
 
 func (command *createAccountCommand) showUsage() {
@@ -127,8 +128,14 @@ func loadCommandHandler() map[string]commandHandler {
 	exitCommand := exitCommand{newBaseCommand("exit", "exit the program")}
 	commandMap[exitCommand.name] = &exitCommand
 
-	createAccountCommand := createAccountCommand{newBaseCommand("create_account", "create new rocket account")}
-	commandMap[createAccountCommand.name] = &createAccountCommand
+	createNomalAccountCommand := createAccountCommand{newBaseCommand("create_account", "create new proposer account"), -1}
+	commandMap[createNomalAccountCommand.name] = &createNomalAccountCommand
+
+	createProposerAccountCommand := createAccountCommand{newBaseCommand("create_proposer_account", "create new proposer account"), 1}
+	commandMap[createProposerAccountCommand.name] = &createProposerAccountCommand
+
+	createValidatorAccountCommand := createAccountCommand{newBaseCommand("create_validator_account", "create new validator account"), 0}
+	commandMap[createValidatorAccountCommand.name] = &createValidatorAccountCommand
 
 	createGenesisGroupCommand := createGenesisGroupCommand{baseCommand: newBaseCommand("create_genesis_group", "create new genesis group")}
 	createGenesisGroupCommand.paramParser = flag.NewFlagSet(createGenesisGroupCommand.name, flag.ContinueOnError)

@@ -2,6 +2,7 @@ package util
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"golang.org/x/crypto/sha3"
 	"hash"
 	"math/rand"
@@ -78,6 +79,12 @@ func (h *Hash) Set(other Hash) {
 	for i, v := range other {
 		h[i] = v
 	}
+}
+
+func (h Hash) Hex() string { return "0x" + hex.EncodeToString(h[:]) }
+
+func (h Hash) String() string {
+	return h.Hex()
 }
 
 // Generate implements testing/quick.Generator.
