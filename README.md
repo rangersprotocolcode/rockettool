@@ -1,6 +1,6 @@
-# Rocket Tool
-该项目是Rocket Node使用时的辅助工具，包含如下功能：
-* 生成新的Rocket账户。
+# Rangers Tool
+该项目是Rangers Node使用时的辅助工具，包含如下功能：
+* 生成新的Rangers账户。
 * 生成新的创始组信息。
 
 
@@ -29,7 +29,7 @@
 
 
 ##### 6.create_genesis_group
-创建新的Rocket创始组。
+创建新的Rangers创始组。
 -member_count 参数用来指定创始组成员的数量，默认是3。
 
 该命令生成如下内容:  
