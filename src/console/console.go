@@ -23,7 +23,7 @@ func InitConsole() {
 		consoleInstance.commandHandlerMap = loadCommandHandler()
 	}
 
-	fmt.Println("Welcome to use rocket tool!")
+	fmt.Println("Welcome to use rangers tool!")
 	consoleInstance.readCommandLoop()
 }
 
@@ -51,7 +51,7 @@ func (console *console) readCommandLoop() {
 }
 
 func parseInput(reader *liner.State) []string {
-	input, err := reader.Prompt(fmt.Sprintf("rocketTool:> "))
+	input, err := reader.Prompt(fmt.Sprintf("rangersTool:> "))
 	if err != nil {
 		if err == liner.ErrPromptAborted {
 			reader.Close()
