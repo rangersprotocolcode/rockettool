@@ -16,11 +16,19 @@
 查看工具版本号
 
 ##### 3.create_account
-创建新的Rocket账户，包含账户的私钥以及申请矿工所需要的信息
+创建新的Rangers账户，包含账户的私钥以及申请矿工所需要的信息
 ![images](images/create_account.png)
 
+##### 4.create_proposer_account
+创建新的Rangers账户，包含账户的私钥以及申请提案矿工所需要的信息
+![images](images/create_proposer_account.png)
 
-##### 4.create_genesis_group
+##### 5.create_validator_account
+创建新的Rangers账户，包含账户的私钥以及申请验证矿工所需要的信息
+![images](images/create_validator_account.png)
+
+
+##### 6.create_genesis_group
 创建新的Rocket创始组。
 -member_count 参数用来指定创始组成员的数量，默认是3。
 
