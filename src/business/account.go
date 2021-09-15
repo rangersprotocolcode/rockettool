@@ -72,7 +72,7 @@ func printAccountInfo(privateKey privateKey, nodeType int) {
 
 func printMinerApplyTx(nodeType int, target, data string) {
 	{
-		source := "0x6420e467c77514e09471a7d84e0552c13b5e97192f523c05d3970d7ee23bf443"
+		source := "0x38780174572fb5b4735df1b7c69aee77ff6e9f49"
 		tx := model.Transaction{Type: 2, Source: source, Target: target, Time: time.Now().String()}
 
 		//data := `{"id":"mlrcS4PtQnL4rwxGaGqThwE5GuNXa3eJHiq050OPRC4=","publicKey":"BOu0RbvBDBlVUySzb+ojoE7BTO67yhYQWdOvqClYG+Qu11SFY79i1lDou9VkPfnpX0KPhlvtpTIIK3IIR2K1meM=","vrfPublicKey":"Dw7zNJeE4wj+diK2c/P+9raL6R72SY1ySbleYVihJtU="}`
