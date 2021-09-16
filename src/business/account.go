@@ -33,15 +33,20 @@ type publicKey struct {
 	key ecdsa.PublicKey
 }
 
-func CreateNewAccount(nodeType int) {
-	r := rand.Reader
+func CreateNewAccount(nodeType int, privateKeyString string) {
 	var pk privateKey
-	_pk, err := ecdsa.GenerateKey(secp256k1.S256(), r)
-	if err == nil {
-		pk.key = *_pk
+	if 0 == len(privateKeyString) {
+		_pk, err := ecdsa.GenerateKey(secp256k1.S256(), rand.Reader)
+		if err == nil {
+			pk.key = *_pk
+		} else {
+			panic(fmt.Sprintf("GenKey Failed, reason : %v.\n", err.Error()))
+		}
 	} else {
-		panic(fmt.Sprintf("GenKey Failed, reason : %v.\n", err.Error()))
+		pk = *BytesToSecKey(util.FromHex(privateKeyString))
+
 	}
+
 	printAccountInfo(pk, nodeType)
 }
 

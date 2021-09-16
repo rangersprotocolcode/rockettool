@@ -74,7 +74,11 @@ func (command *helpCommand) showUsage() {
 }
 
 func (command *createAccountCommand) process(params []string) {
-	business.CreateNewAccount(command.nodeType)
+	privateKey := ""
+	if 1 == len(params) {
+		privateKey = params[0]
+	}
+	business.CreateNewAccount(command.nodeType, privateKey)
 }
 
 func (command *createAccountCommand) showUsage() {
