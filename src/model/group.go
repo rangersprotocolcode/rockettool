@@ -58,7 +58,7 @@ type GroupHeader struct {
 
 func NewGenesisGroupHeader(memIds []bls.ID) *GroupHeader {
 	gh := &GroupHeader{
-		Name:          "GX genesis group",
+		Name:          "Rangers Protocol Genesis Group",
 		Authority:     777,
 		BeginTime:     time.Now(),
 		CreateHeight:  0,
