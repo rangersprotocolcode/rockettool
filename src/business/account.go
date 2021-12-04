@@ -1,13 +1,10 @@
 package business
 
 import (
-	"RocketTool/src/ecdsa/bls"
 	"RocketTool/src/ecdsa/secp256k1"
 	"RocketTool/src/ecdsa/sha3"
-	"RocketTool/src/ecdsa/vrf"
 	"RocketTool/src/model"
 	"RocketTool/src/util"
-	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
@@ -51,26 +48,19 @@ func CreateNewAccount(nodeType int, privateKeyString string) {
 }
 
 func printAccountInfo(privateKey privateKey, nodeType int) {
-
-	publicKey := privateKey.getPubKey()
-	address := publicKey.GetAddress()
-
+	selfMinerInfo := NewSelfMinerInfo(privateKey)
 	var miner model.Miner
-	miner.Id = address.Bytes()
-
-	secretSeed := util.RandFromBytes(address.Bytes())
-	minerSecKey := *bls.NewSeckeyFromRand(secretSeed)
-	minerPubKey := *bls.GeneratePubkey(minerSecKey)
-	vrfPK, _, _ := vrf.VRFGenerateKey(bytes.NewReader(secretSeed.Bytes()))
-
-	miner.PublicKey = minerPubKey.Serialize()
-	miner.VrfPublicKey = vrfPK
+	miner.Id = selfMinerInfo.ID.Serialize()
+	miner.PublicKey = selfMinerInfo.PubKey.Serialize()
+	miner.VrfPublicKey = selfMinerInfo.VrfPK
 	minerJson, _ := json.Marshal(miner)
 
 	fmt.Println("Account info:")
 	fmt.Println("PrivateKey:" + privateKey.getHexString())
 	fmt.Println("MinerJson:" + string(minerJson))
 	if -1 != nodeType {
+		publicKey := privateKey.getPubKey()
+		address := publicKey.GetAddress()
 		printMinerApplyTx(nodeType, "0x"+hex.EncodeToString(address[:]), string(minerJson))
 	}
 }

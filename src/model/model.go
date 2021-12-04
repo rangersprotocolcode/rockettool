@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"math/big"
 	"strconv"
 )
@@ -41,10 +42,26 @@ type SharePiece struct {
 	Pub   bls.Pubkey
 }
 
+type HexBytes []byte
+
+func (h *HexBytes) UnmarshalJSON(b []byte) error {
+	if 2 > len(b) {
+		return fmt.Errorf("length error, %d", len(b))
+	}
+	res := string(b[1 : len(b)-1])
+	*h = util.FromHex(res)
+	return nil
+}
+
+func (h HexBytes) MarshalJSON() ([]byte, error) {
+	res := fmt.Sprintf("\"%s\"", util.ToHex(h))
+	return []byte(res), nil
+}
+
 type Miner struct {
-	Id           []byte `json:"id,omitempty"`
-	PublicKey    []byte `json:"publicKey,omitempty"`
-	VrfPublicKey []byte `json:"vrfPublicKey,omitempty"`
+	Id           HexBytes `json:"id,omitempty"`
+	PublicKey    HexBytes `json:"publicKey,omitempty"`
+	VrfPublicKey []byte   `json:"vrfPublicKey,omitempty"`
 
 	Type int `json:"type,omitempty"`
 

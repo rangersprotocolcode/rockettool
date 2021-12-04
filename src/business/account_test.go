@@ -10,7 +10,7 @@ import (
 )
 
 func TestCreateNewAccount(t *testing.T) {
-	pkString := "0x0411c6362e7ece1fcbbe98085bcc8410749c2bebf546da7d7406e1e9a20afdabe29eb6826e1ea25c3d0e8c2db953661d5e37c1f5f71dc8fbd5d0b7422e3f0aeff320f7f665561eae7693ade2f9592530c2f9b67b1d6cc2897b0c71b7d7b8d02a3a"
+	pkString := "0x041aa9c9a10319ed4bbc50833dcd5084213978db8b81167c39054de25e6ec2aa66835a629ad94aed80e878754724809f07be09247126f3cf4eadb225c7a2f6c764d7f5d173593eff81a50f7d8ea345bbc543ad8e356e75975e87114438c8f4eaf4"
 	pk := HexStringToSecKey(pkString)
 
 	fmt.Println(pk)
@@ -26,5 +26,15 @@ func TestCreateNewAccount(t *testing.T) {
 	miner.VrfPK, miner.VrfSK, _ = ed25519.GenerateKey(&miner)
 
 	fmt.Println(miner)
+
+}
+
+func TestCreateNewAddress(t *testing.T) {
+	pkString := "0x041aa9c9a10319ed4bbc50833dcd5084213978db8b81167c39054de25e6ec2aa66835a629ad94aed80e878754724809f07be09247126f3cf4eadb225c7a2f6c764d7f5d173593eff81a50f7d8ea345bbc543ad8e356e75975e87114438c8f4eaf4"
+	pk := HexStringToSecKey(pkString)
+
+	addr := pk.getPubKey().GetAddress()
+
+	fmt.Println(util.ToHex(addr.Bytes()))
 
 }
