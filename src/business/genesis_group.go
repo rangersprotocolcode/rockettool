@@ -3,8 +3,12 @@ package business
 import (
 	"RocketTool/src/ecdsa/bls"
 	"RocketTool/src/ecdsa/ed25519"
+	"RocketTool/src/ecdsa/secp256k1"
 	"RocketTool/src/model"
 	"RocketTool/src/util"
+	"crypto/ecdsa"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -39,27 +43,40 @@ func CreateGenesisGroup(groupMemberNum uint64) {
 
 func createGroupMembers() {
 	var i uint64 = 0
-	pks := []string{"0x043b1e81d607ab0cd11fa5050437f15d3fbc074d422640686f8c6f4473473c63ebc4e43f0a5faa75216b3d62c0326bf11c33f0c8847d9dc68bded297e28d7cc0a88114f89b10266958149b3d9dc3fb85601e30332636e44d85f00ed2de368e0db8", "0x04e7254f4b44e77255b8e36e23c4586a71089f115b4529811ac71d306dfee91a24e8856c63714bd66f6339c2305e5d29e5f7adfdef58adb5f0e74c957f22fb9c7548bd8da5c8ed43ea9803473ce09eec2beb16d1ef593d98f70d6c63f9042a8eb1", "0x04c0814a21657f55b954012e376402020d03653d4db35dc6e66b815b543590f49c5818c359f345447042a266c89cc8fbeab6f78d3d8a33904a8f564ec685e5e7527baa9329ba1bc8344d947f405bba23a271b5fef8780203b37ab8bf4bbc1cc395"}
 	for ; i < genesisGroupMemberNum; i++ {
 		miner := model.MinerInfo{}
-		//var pk privateKey
-		//miner.PrivateKey, miner.PublicKey, pk = newAccount()
+		var sk privateKey
+		var idStr string
+		miner.PrivateKey, miner.PublicKey, idStr, sk = newAccount()
+		miner.ID.SetHexString(idStr)
 
-		pk := HexStringToSecKey(pks[i])
-		miner.PrivateKey = pk.getHexString()
-		miner.PublicKey = pk.getPubKey().getHexString()
-		miner.SecretSeed = util.RandFromBytes(pk.key.D.Bytes())
+		miner.SecretSeed = util.RandFromBytes(sk.key.D.Bytes())
 		miner.MinerSeckey = *bls.NewSeckeyFromRand(miner.SecretSeed)
 		miner.MinerPublicKey = *bls.GeneratePubkey(miner.MinerSeckey)
-
-		idBytes := pk.getPubKey().getID()
-		miner.ID.Deserialize(idBytes)
 
 		miner.VrfPK, miner.VrfSK, _ = ed25519.GenerateKey(&miner)
 		miner.ReceivedSharePiece = make([]*model.SharePiece, 0)
 
 		groupMemberList = append(groupMemberList, &miner)
 	}
+}
+
+func newAccount() (string, string, string, privateKey) {
+	r := rand.Reader
+	var pk privateKey
+	_pk, err := ecdsa.GenerateKey(secp256k1.S256(), r)
+	if err == nil {
+		pk.key = *_pk
+	} else {
+		panic(fmt.Sprintf("GenKey Failed, reason : %v.\n", err.Error()))
+	}
+	privateKeyStr := pk.getHexString()
+
+	publicKey := pk.getPubKey()
+	publicKeyStr := publicKey.getHexString()
+
+	idStr := PREFIX + hex.EncodeToString(publicKey.getID())
+	return privateKeyStr, publicKeyStr, idStr, pk
 }
 
 func mockGenSharePiece() {
