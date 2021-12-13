@@ -27,7 +27,6 @@
 创建新的Rangers账户，包含账户的私钥以及申请验证矿工所需要的信息
 ![images](images/create_validator_account.png)
 
-
 ##### 6.create_genesis_group
 创建新的Rangers创始组。
 -member_count 参数用来指定创始组成员的数量，默认是3。
@@ -41,3 +40,11 @@
 
 (3)每个创始组成员加入的组信息
 ![images](images/joined_group.png)
+
+##### 7.create_miner_reward
+创建更改矿工收益账号的交易原文，需要提供当前收益账号的私钥、矿工id（可在下表查询）、新的收益账号
+
+简单的实例如下：
+![images](images/create_miner_reward.png)
+
+此处的"raw transaction" 后的信息，即为要发送的交易原文。可通过标准的ws客户端发送给rangersprotocol网络，完成变更收益账户的操作。

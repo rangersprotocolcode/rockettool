@@ -40,7 +40,7 @@ func CreateNewAccount(nodeType int, privateKeyString string) {
 			panic(fmt.Sprintf("GenKey Failed, reason : %v.\n", err.Error()))
 		}
 	} else {
-		pk = *BytesToSecKey(util.FromHex(privateKeyString))
+		pk = *HexStringToSecKey(privateKeyString)
 
 	}
 
@@ -100,13 +100,29 @@ func printMinerApplyTx(nodeType int, target, data string) {
 }
 
 //导入函数
+//func HexStringToSecKey(s string) (sk *privateKey) {
+//	if len(s) < len(PREFIX) || s[:len(PREFIX)] != PREFIX {
+//		return
+//	}
+//	buf, _ := hex.DecodeString(s[len(PREFIX):])
+//	sk = BytesToSecKey(buf)
+//	return
+//}
+
+//导入函数
 func HexStringToSecKey(s string) (sk *privateKey) {
 	if len(s) < len(PREFIX) || s[:len(PREFIX)] != PREFIX {
 		return
 	}
-	buf, _ := hex.DecodeString(s[len(PREFIX):])
-	sk = BytesToSecKey(buf)
+	sk = new(privateKey)
+	sk.key.D = new(big.Int).SetBytes(util.FromHex(s))
+	sk.key.PublicKey.Curve = getDefaultCurve()
+	sk.key.PublicKey.X, sk.key.PublicKey.Y = getDefaultCurve().ScalarBaseMult(sk.key.D.Bytes())
 	return
+}
+
+func getDefaultCurve() elliptic.Curve {
+	return secp256k1.S256()
 }
 
 func BytesToSecKey(data []byte) (sk *privateKey) {
@@ -140,20 +156,9 @@ func BytesToPublicKey(data []byte) (pk *publicKey) {
 }
 
 func (pk *privateKey) getHexString() string {
-	buf := pk.toBytes()
+	buf := pk.key.D.Bytes()
 	str := PREFIX + hex.EncodeToString(buf)
 	return str
-}
-
-func (pk *privateKey) toBytes() []byte {
-	buf := make([]byte, SecKeyLength)
-	copy(buf[:PubKeyLength], pk.getPubKey().toBytes())
-	d := pk.key.D.Bytes()
-	if len(d) > 32 {
-		panic("privateKey data length error: D length is more than 32!")
-	}
-	copy(buf[SecKeyLength-len(d):SecKeyLength], d)
-	return buf
 }
 
 func (pk *privateKey) getPubKey() publicKey {

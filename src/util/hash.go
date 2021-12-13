@@ -39,6 +39,19 @@ func (a *Address) SetBytes(b []byte) {
 
 func (a Address) Bytes() []byte { return a[:] }
 
+func (a Address) MarshalJSON() ([]byte, error) {
+	return []byte("\"" + a.GetHexString() + "\""), nil
+}
+
+func (a Address) GetHexString() string {
+	str := ToHex(a[:])
+	return str
+}
+
+func (a Address) String() string {
+	return a.GetHexString()
+}
+
 func BytesToHash(b []byte) Hash {
 	var h Hash
 	h.SetBytes(b)

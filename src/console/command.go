@@ -39,6 +39,20 @@ type createAccountCommand struct {
 	nodeType int
 }
 
+type createMinerRewardCommand struct {
+	baseCommand
+}
+
+func (c createMinerRewardCommand) process(params []string) {
+
+	if 3 != len(params) {
+		fmt.Println("wrong params")
+		return
+	}
+
+	business.GenerateMinerRewardAccountTx(params[0], params[1], params[2])
+}
+
 type createGenesisGroupCommand struct {
 	baseCommand
 
@@ -145,6 +159,9 @@ func loadCommandHandler() map[string]commandHandler {
 	createGenesisGroupCommand.paramParser = flag.NewFlagSet(createGenesisGroupCommand.name, flag.ContinueOnError)
 	createGenesisGroupCommand.paramParser.Uint64Var(&createGenesisGroupCommand.genesisGroupMemberNum, "member_count", 3, "genesis group member count")
 	commandMap[createGenesisGroupCommand.name] = &createGenesisGroupCommand
+
+	createMinerAccountCommand := createMinerRewardCommand{newBaseCommand("create_miner_reward", "create miner reward account")}
+	commandMap[createMinerAccountCommand.name] = &createMinerAccountCommand
 
 	return commandMap
 }

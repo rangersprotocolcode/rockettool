@@ -68,11 +68,8 @@ type Miner struct {
 	// 质押数
 	Stake uint64 `json:"stake,omitempty"`
 
-	ApplyHeight uint64
-	AbortHeight uint64 `json:"-"`
-
-	// 当前状态
-	Status byte
+	// 收益账户
+	Account HexBytes `json:"account,omitempty"`
 }
 
 type Sign struct {
@@ -114,6 +111,7 @@ type Transaction struct {
 	Nonce           uint64 // 用户级别nonce
 	RequestId       uint64 // 消息编号 由网关添加
 	SocketRequestId string // websocket id，用于客户端标示请求id，方便回调处理
+	ChainId         string //用于区分不同的链
 }
 
 func (tx *Transaction) GenHash() util.Hash {
@@ -129,13 +127,14 @@ func (tx *Transaction) GenHash() util.Hash {
 	buffer.Write([]byte(strconv.Itoa(int(tx.Type))))
 	buffer.Write([]byte(tx.Time))
 	buffer.Write([]byte(tx.ExtraData))
+	buffer.Write([]byte(tx.ChainId))
 	return util.BytesToHash(util.Sha256(buffer.Bytes()))
 }
 
 func (tx Transaction) ToTxJson() TxJson {
 	txJson := TxJson{Source: tx.Source, Target: tx.Target, Type: tx.Type, Time: tx.Time,
 		Data: tx.Data, ExtraData: tx.ExtraData, Nonce: tx.Nonce,
-		Hash: tx.Hash.String(), RequestId: tx.RequestId, SocketRequestId: tx.SocketRequestId}
+		Hash: tx.Hash.String(), RequestId: tx.RequestId, SocketRequestId: tx.SocketRequestId, ChainId: tx.ChainId}
 
 	if tx.Sign != nil {
 		txJson.Sign = tx.Sign.GetHexString()
@@ -162,6 +161,7 @@ type TxJson struct {
 	Nonce           uint64 `json:"nonce,omitempty"`
 	RequestId       uint64
 	SocketRequestId string `json:"socketRequestId,omitempty"`
+	ChainId         string `json:"chainId,omitempty"`
 }
 
 func (txJson TxJson) ToString() string {
