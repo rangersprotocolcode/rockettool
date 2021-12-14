@@ -51,6 +51,7 @@
 
 交易可通过标准的ws客户端发送给rangersprotocol网络，完成变更收益账户的操作。实例如下：
 
+![images](images/ws.png)
 
 ws的链接为： wss://mainnet.rangersprotocol.com/pubhub/api/writer
 
