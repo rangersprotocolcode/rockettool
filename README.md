@@ -47,7 +47,12 @@
 简单的实例如下：
 ![images](images/create_miner_reward.png)
 
-此处的"raw transaction" 后的信息，即为要发送的交易原文。可通过标准的ws客户端发送给rangersprotocol网络，完成变更收益账户的操作。
+此处的"raw transaction" 后的信息，即为要发送的交易原文。
+
+交易可通过标准的ws客户端发送给rangersprotocol网络，完成变更收益账户的操作。实例如下：
+
+
+ws的链接为： wss://mainnet.rangersprotocol.com/pubhub/api/writer
 
 |  矿工id   | 初始收益账户  |
 |  ----  | ----  |
