@@ -61,14 +61,13 @@ func printAccountInfo(privateKey privateKey, nodeType int) {
 	if -1 != nodeType {
 		publicKey := privateKey.getPubKey()
 		address := publicKey.GetAddress()
-		printMinerApplyTx(nodeType, "0x"+hex.EncodeToString(address[:]), string(minerJson))
+		printMinerApplyTx(nodeType, "0x"+hex.EncodeToString(address[:]), privateKey.getHexString(), string(minerJson))
 	}
 }
 
-func printMinerApplyTx(nodeType int, target, data string) {
+func printMinerApplyTx(nodeType int, source, privateKeyStr, data string) {
 	{
-		source := "0x38780174572fb5b4735df1b7c69aee77ff6e9f49"
-		tx := model.Transaction{Type: 2, Source: source, Target: target, Time: time.Now().String()}
+		tx := model.Transaction{Type: 2, Source: source, Target: source, Time: time.Now().String()}
 
 		//data := `{"id":"mlrcS4PtQnL4rwxGaGqThwE5GuNXa3eJHiq050OPRC4=","publicKey":"BOu0RbvBDBlVUySzb+ojoE7BTO67yhYQWdOvqClYG+Qu11SFY79i1lDou9VkPfnpX0KPhlvtpTIIK3IIR2K1meM=","vrfPublicKey":"Dw7zNJeE4wj+diK2c/P+9raL6R72SY1ySbleYVihJtU="}`
 		var obj = model.Miner{}
@@ -78,9 +77,9 @@ func printMinerApplyTx(nodeType int, target, data string) {
 		}
 
 		if 1 == nodeType {
-			obj.Stake = 1250
+			obj.Stake = 2000
 		} else {
-			obj.Stake = 250
+			obj.Stake = 400
 		}
 		obj.Type = nodeType
 
@@ -90,7 +89,7 @@ func printMinerApplyTx(nodeType int, target, data string) {
 		tx.Data = string(applyData)
 		tx.Hash = tx.GenHash()
 
-		privateKeyStr := "0x040a0c4baa2e0b927a2b1f6f93b317c320d4aa3a5b54c0a83f5872c23155dcf1455fb015a7699d4ef8491cc4c7a770e580ab1362a0e3af9f784dd2485cfc9ba7c1e7260a418579c2e6ca36db4fe0bf70f84d687bdf7ec6c0c181b43ee096a84aea"
+		// privateKeyStr := "0x040a0c4baa2e0b927a2b1f6f93b317c320d4aa3a5b54c0a83f5872c23155dcf1455fb015a7699d4ef8491cc4c7a770e580ab1362a0e3af9f784dd2485cfc9ba7c1e7260a418579c2e6ca36db4fe0bf70f84d687bdf7ec6c0c181b43ee096a84aea"
 		privateKey := HexStringToSecKey(privateKeyStr)
 		sign := privateKey.Sign(tx.Hash.Bytes())
 		tx.Sign = &sign
