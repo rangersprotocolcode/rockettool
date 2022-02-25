@@ -19,6 +19,7 @@ const (
 	PubKeyLength = 65 //公钥字节长度，1 bytes curve, 64 bytes x,y。
 	SecKeyLength = 97 //私钥字节长度，65 bytes pub, 32 bytes D。
 
+	CHAIN_ID = "2025" // Rangers mainnet
 	PREFIX = "0x"
 )
 
@@ -61,36 +62,26 @@ func printAccountInfo(privateKey privateKey, nodeType int) {
 	if -1 != nodeType {
 		publicKey := privateKey.getPubKey()
 		address := publicKey.GetAddress()
-		printMinerApplyTx(nodeType, "0x"+hex.EncodeToString(address[:]), privateKey.getHexString(), string(minerJson))
+		printMinerApplyTx(nodeType, address.GetHexString(), privateKey, miner)
 	}
 }
 
-func printMinerApplyTx(nodeType int, source, privateKeyStr, data string) {
+func printMinerApplyTx(nodeType int, source string, privateKey privateKey, miner model.Miner) {
 	{
-		tx := model.Transaction{Type: 2, Source: source, Target: source, Time: time.Now().String()}
-
-		//data := `{"id":"mlrcS4PtQnL4rwxGaGqThwE5GuNXa3eJHiq050OPRC4=","publicKey":"BOu0RbvBDBlVUySzb+ojoE7BTO67yhYQWdOvqClYG+Qu11SFY79i1lDou9VkPfnpX0KPhlvtpTIIK3IIR2K1meM=","vrfPublicKey":"Dw7zNJeE4wj+diK2c/P+9raL6R72SY1ySbleYVihJtU="}`
-		var obj = model.Miner{}
-		err := json.Unmarshal([]byte(data), &obj)
-		if err != nil {
-			fmt.Printf("ummarshal error:%v", err)
-		}
+		tx := model.Transaction{Type: 2, Source: source, Target: source, Time: time.Now().String(), ChainId: CHAIN_ID}
 
 		if 1 == nodeType {
-			obj.Stake = 2000
+			miner.Stake = 2000
 		} else {
-			obj.Stake = 400
+			miner.Stake = 400
 		}
-		obj.Type = nodeType
-
-		applyData, _ := json.Marshal(obj)
-		//fmt.Printf("data:%v\n",string(applyData))
+		miner.Type = nodeType
+		applyData, _ := json.Marshal(miner)
+		fmt.Printf("data:%v\n",string(applyData))
 
 		tx.Data = string(applyData)
 		tx.Hash = tx.GenHash()
 
-		// privateKeyStr := "0x040a0c4baa2e0b927a2b1f6f93b317c320d4aa3a5b54c0a83f5872c23155dcf1455fb015a7699d4ef8491cc4c7a770e580ab1362a0e3af9f784dd2485cfc9ba7c1e7260a418579c2e6ca36db4fe0bf70f84d687bdf7ec6c0c181b43ee096a84aea"
-		privateKey := HexStringToSecKey(privateKeyStr)
 		sign := privateKey.Sign(tx.Hash.Bytes())
 		tx.Sign = &sign
 
