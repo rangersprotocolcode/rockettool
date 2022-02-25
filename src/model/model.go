@@ -63,7 +63,7 @@ type Miner struct {
 	PublicKey    HexBytes `json:"publicKey,omitempty"`
 	VrfPublicKey []byte   `json:"vrfPublicKey,omitempty"`
 
-	Type int `json:"type,omitempty"`
+	Type int `json:"type"` // Cannot omitempty because type 0 is validator
 
 	// 质押数
 	Stake uint64 `json:"stake,omitempty"`
